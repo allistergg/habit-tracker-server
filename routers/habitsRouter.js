@@ -88,12 +88,41 @@ router.get('/api/habits', (req, res) => {
 })
 
 router.post('/api/habits', (req, res) => {
+    let newHabitResult;
+    const newHabit = {name : req.body.name}
+    Habit.create(newHabit)
+    .then(result => {
+        newHabitResult = result
+        console.log(newHabitResult)
+        Day.find({})
+        .populate('habits.habit')
+        .then(_results => {
+            let results = _results;
+            results = results.forEach(day => {
+                day.habits.push({checked: false, habit: newHabitResult._id.toString()})
+                day.save()
+            })
+            Promise.resolve()
+            })
+            .then(() => {
+                Day.find({})
+                .populate('habits.habit')
+                .then(results => {
+                    console.log(results)
+                    res.json(results)
+                })
+            })
 
-    const newHabit = { id: habits[habits.length - 1].id + 1, habit: req.body.habit, checked: false }
-    habits = [...habits, newHabit]
-    res.json(habits[habits.length - 1])
+            
+           
+        })
+        });
+   
+    
 
-})
+
+
+
 
 router.put('/api/habits', (req, res, next) => {
     const habitId = req.body.id
@@ -109,7 +138,6 @@ router.put('/api/habits', (req, res, next) => {
             console.log('foundHabit', foundHabit);
             foundHabit.checked = !foundHabit.checked;
             day.save();
-            
             console.log('line 113', day)
             res.json(day)
         })
