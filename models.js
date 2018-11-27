@@ -3,13 +3,11 @@
 
 const mongoose = require("mongoose");
 
-// this is our schema to represent a restaurant
 const daySchema = mongoose.Schema({
   date: {type : Date, required: true, unique: true},
   habits: [
       {
         habit: { type: mongoose.Schema.Types.ObjectId, ref: 'Habit'},
-        
         checked: Boolean
       }
   ]
