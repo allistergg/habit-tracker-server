@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {Day, Habit} = require('../models');
+const { Day, Habit } = require('../models');
 
 // let habits = [
 //     { id: 0, habit: "Study Spanish", checked: false },
@@ -79,46 +79,39 @@ const {Day, Habit} = require('../models');
 
 router.get('/api/habits', (req, res) => {
     Day.find({})
-    .populate('habits.habit')
-    .then(data => {
-        console.log(data)
-        res.json(data)
-    })
-    
+        .populate('habits.habit')
+        .then(data => {
+            console.log(data)
+            res.json(data)
+        })
+
 })
 
 router.post('/api/habits', (req, res) => {
     let newHabitResult;
-    const newHabit = {name : req.body.name}
+    const newHabit = { name: req.body.name }
     Habit.create(newHabit)
-    .then(result => {
-        newHabitResult = result
-        console.log(newHabitResult)
-        Day.find({})
-        .populate('habits.habit')
-        .then(_results => {
-            let results = _results;
-            results = results.forEach(day => {
-                day.habits.push({checked: false, habit: newHabitResult._id.toString()})
-                day.save()
-            })
-            Promise.resolve()
-            })
-            .then(() => {
-                Day.find({})
+        .then(result => {
+            newHabitResult = result
+            console.log(newHabitResult)
+            Day.find({})
                 .populate('habits.habit')
-                .then(results => {
-                    console.log(results)
-                    res.json(results)
+                .then(_results => {
+                    let results = _results;
+                    results = results.forEach(day => {
+                        day.habits.push({ checked: false, habit: newHabitResult._id.toString() })
+                        day.save()
+                    })
+                    Promise.resolve()
                 })
-            })
-
-            
-           
+                .then(() => {
+                    res.json(201, newHabit)
+                        })
+                })
         })
-        });
-   
-    
+
+
+
 
 
 
@@ -130,10 +123,10 @@ router.put('/api/habits', (req, res, next) => {
     const dayId = req.body.day
     console.log(dayId)
     Day.findById(dayId)
-    .populate('habits.habit')
-    .then(_day => {
-        let day = _day;    
-        console.log('line 106', day)
+        .populate('habits.habit')
+        .then(_day => {
+            let day = _day;
+            console.log('line 106', day)
             const foundHabit = day.habits.find(val => val.habit._id.toString() === habitId)
             console.log('foundHabit', foundHabit);
             foundHabit.checked = !foundHabit.checked;
@@ -141,13 +134,13 @@ router.put('/api/habits', (req, res, next) => {
             console.log('line 113', day)
             res.json(day)
         })
-    });
-    
-  
+});
 
-    
 
-    
+
+
+
+
 
 
 module.exports = router;
