@@ -87,13 +87,20 @@ router.get('/api/habits', (req, res) => {
 
 })
 
+router.get('/api/habits/names', (req, res) => {
+    Habit.find({})
+    .then(data => {
+        res.json(data)
+    })
+})
+
 router.post('/api/habits', (req, res) => {
     let newHabitResult;
     const newHabit = { name: req.body.name }
     Habit.create(newHabit)
         .then(result => {
             newHabitResult = result
-            console.log(newHabitResult)
+            console.log('newHabitResult:', newHabitResult)
             Day.find({})
                 .populate('habits.habit')
                 .then(_results => {
@@ -105,12 +112,15 @@ router.post('/api/habits', (req, res) => {
                     Promise.resolve()
                 })
                 .then(() => {
-                    res.json(201, newHabit)
-                        })
+                    res.status(201).json(newHabit)
                 })
         })
+})
 
-
+router.delete('/api/habits/:id', (req, res, next) => {
+    const habitId = req.params.id
+    console.log(habitId)
+})
 
 
 
@@ -135,6 +145,8 @@ router.put('/api/habits', (req, res, next) => {
             res.json(day)
         })
 });
+
+
 
 
 
