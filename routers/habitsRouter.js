@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { Day, Habit } = require('../models');
+const passport = require('passport')
+const { Day, Habit } = require('../models/habits-days');
+
 
 // let habits = [
 //     { id: 0, habit: "Study Spanish", checked: false },
@@ -75,9 +77,9 @@ const { Day, Habit } = require('../models');
 //     }
 // }
 
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-
-router.get('/api/habits', (req, res) => {
+router.get('/', (req, res) => {
     Day.find({})
         .populate('habits.habit')
         .then(data => {
@@ -87,14 +89,14 @@ router.get('/api/habits', (req, res) => {
 
 })
 
-router.get('/api/habits/names', (req, res) => {
+router.get('/names', (req, res) => {
     Habit.find({})
         .then(data => {
             res.json(data)
         })
 })
 
-router.post('/api/habits', (req, res) => {
+router.post('/', (req, res) => {
     let newHabitResult;
     const newHabit = { name: req.body.name }
     Habit.create(newHabit)
@@ -112,12 +114,12 @@ router.post('/api/habits', (req, res) => {
                     Promise.resolve()
                 })
                 .then(() => {
-                    res.status(201).json(newHabit)
+                    res.status(201).json(newHabitResult)
                 })
         })
 })
 
-router.delete('/api/habits/:id', (req, res, next) => {
+router.delete('/:id', (req, res, next) => {
     const habitId = req.params.id
     Habit.findByIdAndRemove(habitId)
         .then(() => {
@@ -145,7 +147,7 @@ router.delete('/api/habits/:id', (req, res, next) => {
 
 
 
-router.put('/api/habits', (req, res, next) => {
+router.put('/', (req, res, next) => {
     const habitId = req.body.id
     console.log(habitId)
     const dayId = req.body.day
