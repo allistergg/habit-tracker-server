@@ -89,9 +89,9 @@ router.get('/api/habits', (req, res) => {
 
 router.get('/api/habits/names', (req, res) => {
     Habit.find({})
-    .then(data => {
-        res.json(data)
-    })
+        .then(data => {
+            res.json(data)
+        })
 })
 
 router.post('/api/habits', (req, res) => {
@@ -119,8 +119,26 @@ router.post('/api/habits', (req, res) => {
 
 router.delete('/api/habits/:id', (req, res, next) => {
     const habitId = req.params.id
-    console.log(habitId)
-})
+    Habit.findByIdAndRemove(habitId)
+        .then(() => {
+            Day.find({})
+                .then(results => {
+                    console.log(results)
+                    results.forEach(_day => {
+                        let day = _day
+                        const foundHabit = day.habits.find(habit => habit.habit.toString() === habitId)
+                        const foundHabitIndex = day.habits.indexOf(foundHabit)
+                        day.habits.splice(foundHabitIndex, 1)
+                        day.save()
+
+                    })
+                })
+            .then(() => {
+                res.status(200).json(habitId)
+            })
+        })
+    })
+
 
 
 
@@ -137,7 +155,7 @@ router.put('/api/habits', (req, res, next) => {
         .then(_day => {
             let day = _day;
             console.log('line 106', day)
-            const foundHabit = day.habits.find(val => val.habit._id.toString() === habitId)
+            const foundHabit = day.habits.find(habit => habit.habit._id.toString() === habitId)
             console.log('foundHabit', foundHabit);
             foundHabit.checked = !foundHabit.checked;
             day.save();
