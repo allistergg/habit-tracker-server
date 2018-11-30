@@ -80,7 +80,8 @@ const { Day, Habit } = require('../models/habits-days');
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 router.get('/', (req, res) => {
-    Day.find({})
+    let userId = req.user.id
+    Day.find({userId: userId})
         .populate('habits.habit')
         .then(data => {
             console.log(data)
@@ -90,20 +91,22 @@ router.get('/', (req, res) => {
 })
 
 router.get('/names', (req, res) => {
-    Habit.find({})
+    let userId = req.user.id
+    Habit.find({userId : userId})
         .then(data => {
             res.json(data)
         })
 })
 
 router.post('/', (req, res) => {
+    let userId = req.user.id
     let newHabitResult;
-    const newHabit = { name: req.body.name }
+    const newHabit = { name: req.body.name, userId: req.user.id }
     Habit.create(newHabit)
         .then(result => {
             newHabitResult = result
             console.log('newHabitResult:', newHabitResult)
-            Day.find({})
+            Day.find({userId : userId})
                 .populate('habits.habit')
                 .then(_results => {
                     let results = _results;
@@ -120,10 +123,11 @@ router.post('/', (req, res) => {
 })
 
 router.delete('/:id', (req, res, next) => {
+    const userId = req.user.id
     const habitId = req.params.id
-    Habit.findByIdAndRemove(habitId)
+    Habit.findOneAndRemove({_id : habitId, userId : userId})
         .then(() => {
-            Day.find({})
+            Day.find({userId : userId})
                 .then(results => {
                     console.log(results)
                     results.forEach(_day => {
@@ -148,20 +152,24 @@ router.delete('/:id', (req, res, next) => {
 
 
 router.put('/', (req, res, next) => {
+    const userId = req.user.id
+    console.log('userId', userId)
     const habitId = req.body.id
-    console.log(habitId)
+    console.log('habitId', habitId)
     const dayId = req.body.day
-    console.log(dayId)
-    Day.findById(dayId)
+    console.log('dayId', dayId)
+    Day.findOne({
+        _id : dayId,
+        userId: userId})
         .populate('habits.habit')
         .then(_day => {
             let day = _day;
-            console.log('line 106', day)
+            console.log('line 163', day)
             const foundHabit = day.habits.find(habit => habit.habit._id.toString() === habitId)
             console.log('foundHabit', foundHabit);
             foundHabit.checked = !foundHabit.checked;
             day.save();
-            console.log('line 113', day)
+            console.log('line 168', day)
             res.json(day)
         })
 });

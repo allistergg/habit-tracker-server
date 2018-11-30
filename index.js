@@ -27,13 +27,15 @@ app.use(
   })
 );
 
+passport.use(localStrategy);
+passport.use(jwtStrategy);
+
 app.use(express.json())
 app.use('/api/habits', habitsRouter)
 app.use('/api', authRouter)
 app.use('/api/users', usersRouter)
 
-passport.use(localStrategy);
-passport.use(jwtStrategy);
+
 
 // Custom 404 Not Found route handler
 app.use((req, res, next) => {

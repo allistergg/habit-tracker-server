@@ -4,7 +4,7 @@
 const mongoose = require("mongoose");
 
 const daySchema = mongoose.Schema({
-  date: { type: Date, required: true },
+  date: { type: String, required: true },
   habits: [
     {
       habit: { type: mongoose.Schema.Types.ObjectId, ref: 'Habit' },
