@@ -79,7 +79,7 @@ const { Day, Habit } = require('../models/habits-days');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     let userId = req.user.id
     Day.find({userId: userId})
         .populate('habits.habit')
@@ -87,18 +87,24 @@ router.get('/', (req, res) => {
             console.log(data)
             res.json(data)
         })
+        .catch(err => {
+            next(err)
+        })
 
 })
 
-router.get('/names', (req, res) => {
+router.get('/names', (req, res, next) => {
     let userId = req.user.id
     Habit.find({userId : userId})
         .then(data => {
             res.json(data)
         })
+        .catch(err => {
+            next(err)
+        })
 })
 
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
     let userId = req.user.id
     let newHabitResult;
     const newHabit = { name: req.body.name, userId: req.user.id }
@@ -119,6 +125,9 @@ router.post('/', (req, res) => {
                 .then(() => {
                     res.status(201).json(newHabitResult)
                 })
+        })
+        .catch(err => {
+            next(err)
         })
 })
 
@@ -142,6 +151,9 @@ router.delete('/:id', (req, res, next) => {
             .then(() => {
                 res.status(200).json(habitId)
             })
+        })
+        .catch(err => {
+            next(err)
         })
     })
 
