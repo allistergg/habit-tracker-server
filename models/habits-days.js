@@ -15,7 +15,7 @@ const daySchema = mongoose.Schema({
 });
 
 const habitSchema = mongoose.Schema({
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true},
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
 })
 

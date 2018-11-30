@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const User = require('../models/user')
+const {Day} = require('../models/habits-days')
 
 const router = express.Router();
 
@@ -101,7 +102,17 @@ router.post('/', (req, res, next) => {
       return User.create(newUser);
     })
     .then(result => {
-      return res.status(201).location(`/api/users/${result.id}`).json(result);
+        console.log(result)
+        Day.create([
+            {"date" : "0", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "1", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "2", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "3", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "4", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "5", "habits" : [], "userId" : `${result._id}`},
+            {"date" : "6", "habits" : [], "userId" : `${result._id}`}
+        ]);
+        return res.status(201).location(`/api/users/${result.id}`).json(result);
     })
     .catch(err => {
       if (err.code === 11000) {
