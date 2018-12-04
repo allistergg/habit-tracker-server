@@ -3,80 +3,6 @@ const router = express.Router();
 const passport = require('passport')
 const { Day, Habit } = require('../models/habits-days');
 
-
-// let habits = [
-//     { id: 0, habit: "Study Spanish", checked: false },
-//     { id: 1, habit: "Read a novel", checked: false },
-//     { id: 2, habit: "Programming", checked: false }
-// ]
-
-// let days = {
-//     Monday: {
-//         dayId: 1,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-
-//     Tuesday: {
-//         dayId: 2,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-//     Wednesday: {
-//         dayId: 3,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-//     Thursday: {
-//         dayId: 4, 
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-//     Friday: {
-//         dayId: 5,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-//     Saturday: {
-//         dayId: 6,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     },
-//     Sunday: {
-//         dayId: 7,
-//         habits:
-//             [
-//                 { id: 0, habit: "Study Spanish", checked: false },
-//                 { id: 1, habit: "Read a novel", checked: false },
-//                 { id: 2, habit: "Programming", checked: false }
-//             ]
-//     }
-// }
-
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 router.get('/', (req, res, next) => {
@@ -106,8 +32,16 @@ router.get('/names', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
     let userId = req.user.id
+    const {name} = req.body
+    if (!name) {
+        const err = new Error('Missing `name` in request body');
+        err.status = 400;
+        return next(err);
+      }
     let newHabitResult;
     const newHabit = { name: req.body.name, userId: req.user.id }
+    
+    
     Habit.create(newHabit)
         .then(result => {
             newHabitResult = result
