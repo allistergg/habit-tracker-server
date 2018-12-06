@@ -9,8 +9,8 @@ const {Day} = require('../models/habits-days')
 const router = express.Router();
 
 router.post('/', (req, res, next) => {
-  let {username, password } = req.body;
-  const requiredFields = ['username', 'password'];
+  let {username, password, passwordConfirm } = req.body;
+  const requiredFields = ['username', 'password', 'passwordConfirm'];
   const missingField = requiredFields.find(field => !(field in req.body));
   
 
@@ -20,7 +20,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  const stringFields = ['username', 'password'];
+  const stringFields = ['username', 'password', 'passwordConfirm'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -34,7 +34,7 @@ router.post('/', (req, res, next) => {
     });
   }
 
-  const explicityTrimmedFields = ['username', 'password'];
+  const explicityTrimmedFields = ['username', 'password', 'passwordConfirm'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -79,6 +79,14 @@ router.post('/', (req, res, next) => {
           .max} characters long`,
       location: tooSmallField || tooLargeField
     });
+  }
+
+  if (password !== passwordConfirm) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'ValidationError',
+      message: 'Passwords do not match'
+    })
   }
 
 
